@@ -15,8 +15,14 @@ import {
     MenuItem,
     Stack,
     TextField,
-    Typography
+    Typography,
+    Paper,
+    Select,
+    InputLabel,
+    FormControl
 } from '@mui/material';
+
+import { Divider } from 'components/icons'
 
 // project import
 import OrdersTable from './OrdersTable';
@@ -25,7 +31,9 @@ import MonthlyBarChart from './MonthlyBarChart';
 import ReportAreaChart from './ReportAreaChart';
 import SalesColumnChart from './SalesColumnChart';
 import MainCard from 'components/MainCard';
-import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
+import StakingDetail from 'components/cards/statistics/StakingDetails';
+import { styled } from '@mui/material/styles';
+
 
 // assets
 import { GiftOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons';
@@ -40,6 +48,55 @@ const avatarSX = {
     height: 36,
     fontSize: '1rem'
 };
+
+// styles
+const styles = {
+    lockPeriod: {
+        textAlign: 'center',
+        fontFamily: 'Space Grotesk',
+        fontWeight: 400,
+        fontSize: '16px',
+        lineHeight: '20px'
+    },
+    timer: {
+        color: '#F5331E',
+        fontFamily: 'Space Grotesk',
+        fontWeight: 600,
+        fontSize: '32px',
+        lineHeight: '23px'
+
+    },
+    timeCat: {
+        color: '#000515',
+        lineHeight: '10px',
+        fontSize: '12px',
+        mt: 2
+    },
+    lockAmount: {
+        textAlign: 'center',
+        fontFamily: 'Space Grotesk',
+        fontWeight: 500,
+        fontSize: '18px',
+        lineHeight: '16px',
+        color: '#000515',
+        opacity: 0.7,
+        mt: 3
+    },
+    selectBox: {
+        width: '120px',
+        padding: '6px 10px', 
+        fontFamily: 'Space Grotesk', 
+        fontSize: '16px',
+        background: '#e6e6e6',
+        border: '1px solid #ccc'
+    },
+    stakeChartvalue: {
+        fontFamily: 'Space Grotesk',
+        fontSize: '24px',
+        fontWeight: 700,
+        lineHeight: '30px'
+    }
+}
 
 // action style
 const actionSX = {
@@ -67,279 +124,125 @@ const status = [
     }
 ];
 
+const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: '#e5e5e5',
+    borderRadius: 0,
+    paddingTop: '1.25rem',
+    paddingBottom: '1.25rem',
+    textAlign: 'center',
+    boxShadow: 'none',
+    width: '68px'
+}));
+
+
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const DashboardDefault = () => {
     const [value, setValue] = useState('today');
     const [slot, setSlot] = useState('week');
+    const [age, setAge] = useState('');
+
+    const handleChange = (event) => {
+        setAge(event.target.value);
+    };
 
     return (
-        <Grid container rowSpacing={4.5} columnSpacing={3.75} sx={{paddingTop:'5px'}}>
+        <Grid container rowSpacing={4.5} columnSpacing={3.75} sx={{ paddingTop: '5px' }}>
             {/* row 1 */}
-            {/* <Grid item xs={12} sx={{ mb: -2.25 }}>
-                <Typography variant="h5">Dashboard</Typography>
-            </Grid> */}
             <Grid item xs={12} sm={6} md={4} lg={4}>
-                <AnalyticEcommerce title="Total Value Locked" count="4,42,236" percentage={59.3} extra="35,000" />
-            </Grid>
-            {/* <Grid item xs={12} sm={6} md={4} lg={3}>
-                <AnalyticEcommerce title="Total Users" count="78,250" percentage={70.5} extra="8,900" />
-            </Grid> */}
-            <Grid item xs={12} sm={6} md={4} lg={4}>
-                <AnalyticEcommerce title="APY Rate" count="18,800" percentage={27.4} isLoss color="warning" extra="1,943" />
+                <StakingDetail title="Total Value Locked" count="$8,674,523.80" />
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={4}>
-                <AnalyticEcommerce title="Stakers" count="$35,078" percentage={27.4} isLoss color="warning" extra="$20,395" />
+                <StakingDetail title="APY Rate" count="97.23%" />
             </Grid>
-
-            {/* <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} /> */}
+            <Grid item xs={12} sm={6} md={4} lg={4}>
+                <StakingDetail title="Stakers" count="7538" />
+            </Grid>
 
             {/* row 2 */}
-            <Grid item xs={12} md={7} lg={8}>
-                <Grid container alignItems="center" justifyContent="space-between">
-                    <Grid item>
-                        <Typography variant="h5">Unique Visitor</Typography>
-                    </Grid>
-                    <Grid item>
-                        <Stack direction="row" alignItems="center" spacing={0}>
-                            <Button
-                                size="small"
-                                onClick={() => setSlot('month')}
-                                color={slot === 'month' ? 'primary' : 'secondary'}
-                                variant={slot === 'month' ? 'outlined' : 'text'}
+            <Grid item xs={12} md={6} lg={5}>
+                <MainCard >
+                    <Box>
+                        <Typography variant="h4" >Lock Period</Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', pt: 4.5, pb: 7, pl: 1, pr: 1, flexDirection: 'column' }}>
+                            <Stack spacing={1}>
+                                <Typography variant="p" sx={styles.lockPeriod}>Monday</Typography>
+                                <Typography variant="p" sx={styles.lockPeriod}>Monday Dec 26,2022</Typography>
+                            </Stack>
+                            <Stack
+                                direction="row"
+                                divider={<Divider />}
+                                spacing={1.5}
+                                sx={{ mt: '16px' }}
+                                alignItems='center'
                             >
-                                Month
-                            </Button>
-                            <Button
-                                size="small"
-                                onClick={() => setSlot('week')}
-                                color={slot === 'week' ? 'primary' : 'secondary'}
-                                variant={slot === 'week' ? 'outlined' : 'text'}
-                            >
-                                Week
-                            </Button>
-                        </Stack>
-                    </Grid>
-                </Grid>
-                <MainCard content={false} sx={{ mt: 1.5 }}>
-                    <Box sx={{ pt: 1, pr: 2 }}>
-                        <IncomeAreaChart slot={slot} />
+                                <Item>
+                                    <Typography variant="h3" sx={styles.timer} >04</Typography>
+                                    <Typography variant="h3" sx={styles.timeCat} >Days</Typography>
+                                </Item>
+                                <Item>
+                                    <Typography variant="h3" sx={styles.timer} >16</Typography>
+                                    <Typography variant="h3" sx={styles.timeCat} >Hours</Typography>
+                                </Item>
+                                <Item>
+                                    <Typography variant="h3" sx={styles.timer} >24</Typography>
+                                    <Typography variant="h3" sx={styles.timeCat} >Minutes</Typography>
+                                </Item>
+                                <Item>
+                                    <Typography variant="h3" sx={styles.timer} >28</Typography>
+                                    <Typography variant="h3" sx={styles.timeCat} >Seconds</Typography>
+                                </Item>
+                            </Stack>
+                            <Typography variant="p" sx={styles.lockAmount}>$20,000.00 USDT</Typography>
+                        </Box>
                     </Box>
                 </MainCard>
             </Grid>
-            <Grid item xs={12} md={5} lg={4}>
-                <Grid container alignItems="center" justifyContent="space-between">
-                    <Grid item>
-                        <Typography variant="h5">Income Overview</Typography>
-                    </Grid>
-                    <Grid item />
-                </Grid>
-                <MainCard sx={{ mt: 2 }} content={false}>
-                    <Box sx={{ p: 3, pb: 0 }}>
-                        <Stack spacing={2}>
-                            <Typography variant="h6" color="textSecondary">
-                                This Week Statistics
-                            </Typography>
-                            <Typography variant="h3">$7,650</Typography>
+            <Grid item xs={12} md={6} lg={7}>
+                <MainCard>
+                    <Box>
+                        <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                            <Typography variant="h4" sx={{ fontWeight: 700 }} >Staking</Typography>
+                            <Stack direction="row" spacing={2.5}>
+                                <select style={styles.selectBox}>
+                                    <option value="">Select</option>
+                                    <option value="1">Staked</option>
+                                </select>
+                                <select style={{...styles.selectBox, width: '150px'}}>
+                                    <option value="">Select</option>
+                                    <option value="1">Last Week</option>
+                                </select>
+                            </Stack>
                         </Stack>
+                        <Box>
+                            <div style={{marginTop: '32px'}}>
+                                <span style={{...styles.stakeChartvalue, color: '#F40E0E'}}>58,568.25</span>
+                                <span style={{...styles.stakeChartvalue, fontWeight: 400, fontSize: '16px'}}> / ORBN Staked</span> 
+                            </div>
+                        </Box>
                     </Box>
-                    <MonthlyBarChart />
+                    <IncomeAreaChart />
                 </MainCard>
             </Grid>
 
             {/* row 3 */}
-            <Grid item xs={12} md={7} lg={8}>
-                <Grid container alignItems="center" justifyContent="space-between">
-                    <Grid item>
-                        <Typography variant="h5">Recent Orders</Typography>
-                    </Grid>
-                    <Grid item />
-                </Grid>
-                <MainCard sx={{ mt: 2 }} content={false}>
-                    <OrdersTable />
+            <Grid item xs={12} md={6} lg={7}>
+                <MainCard >
+                    
                 </MainCard>
             </Grid>
-            <Grid item xs={12} md={5} lg={4}>
-                <Grid container alignItems="center" justifyContent="space-between">
-                    <Grid item>
-                        <Typography variant="h5">Analytics Report</Typography>
-                    </Grid>
-                    <Grid item />
-                </Grid>
-                <MainCard sx={{ mt: 2 }} content={false}>
-                    <List sx={{ p: 0, '& .MuiListItemButton-root': { py: 2 } }}>
-                        <ListItemButton divider>
-                            <ListItemText primary="Company Finance Growth" />
-                            <Typography variant="h5">+45.14%</Typography>
-                        </ListItemButton>
-                        <ListItemButton divider>
-                            <ListItemText primary="Company Expenses Ratio" />
-                            <Typography variant="h5">0.58%</Typography>
-                        </ListItemButton>
-                        <ListItemButton>
-                            <ListItemText primary="Business Risk Cases" />
-                            <Typography variant="h5">Low</Typography>
-                        </ListItemButton>
-                    </List>
-                    <ReportAreaChart />
+            <Grid item xs={12} md={6} lg={5}>
+                <MainCard>
+                    <Box>
+                        <Typography variant="h4" sx={{ fontWeight: 700 }} >Token Rate</Typography>
+                        <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                            
+                        </Stack>
+                    </Box>
                 </MainCard>
             </Grid>
 
-            {/* row 4 */}
-            <Grid item xs={12} md={7} lg={8}>
-                <Grid container alignItems="center" justifyContent="space-between">
-                    <Grid item>
-                        <Typography variant="h5">Sales Report</Typography>
-                    </Grid>
-                    <Grid item>
-                        <TextField
-                            id="standard-select-currency"
-                            size="small"
-                            select
-                            value={value}
-                            onChange={(e) => setValue(e.target.value)}
-                            sx={{ '& .MuiInputBase-input': { py: 0.5, fontSize: '0.875rem' } }}
-                        >
-                            {status.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Grid>
-                </Grid>
-                <MainCard sx={{ mt: 1.75 }}>
-                    <Stack spacing={1.5} sx={{ mb: -12 }}>
-                        <Typography variant="h6" color="secondary">
-                            Net Profit
-                        </Typography>
-                        <Typography variant="h4">$1560</Typography>
-                    </Stack>
-                    <SalesColumnChart />
-                </MainCard>
-            </Grid>
-            <Grid item xs={12} md={5} lg={4}>
-                <Grid container alignItems="center" justifyContent="space-between">
-                    <Grid item>
-                        <Typography variant="h5">Transaction History</Typography>
-                    </Grid>
-                    <Grid item />
-                </Grid>
-                <MainCard sx={{ mt: 2 }} content={false}>
-                    <List
-                        component="nav"
-                        sx={{
-                            px: 0,
-                            py: 0,
-                            '& .MuiListItemButton-root': {
-                                py: 1.5,
-                                '& .MuiAvatar-root': avatarSX,
-                                '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' }
-                            }
-                        }}
-                    >
-                        <ListItemButton divider>
-                            <ListItemAvatar>
-                                <Avatar
-                                    sx={{
-                                        color: 'success.main',
-                                        bgcolor: 'success.lighter'
-                                    }}
-                                >
-                                    <GiftOutlined />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={<Typography variant="subtitle1">Order #002434</Typography>} secondary="Today, 2:00 AM" />
-                            <ListItemSecondaryAction>
-                                <Stack alignItems="flex-end">
-                                    <Typography variant="subtitle1" noWrap>
-                                        + $1,430
-                                    </Typography>
-                                    <Typography variant="h6" color="secondary" noWrap>
-                                        78%
-                                    </Typography>
-                                </Stack>
-                            </ListItemSecondaryAction>
-                        </ListItemButton>
-                        <ListItemButton divider>
-                            <ListItemAvatar>
-                                <Avatar
-                                    sx={{
-                                        color: 'primary.main',
-                                        bgcolor: 'primary.lighter'
-                                    }}
-                                >
-                                    <MessageOutlined />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                                primary={<Typography variant="subtitle1">Order #984947</Typography>}
-                                secondary="5 August, 1:45 PM"
-                            />
-                            <ListItemSecondaryAction>
-                                <Stack alignItems="flex-end">
-                                    <Typography variant="subtitle1" noWrap>
-                                        + $302
-                                    </Typography>
-                                    <Typography variant="h6" color="secondary" noWrap>
-                                        8%
-                                    </Typography>
-                                </Stack>
-                            </ListItemSecondaryAction>
-                        </ListItemButton>
-                        <ListItemButton>
-                            <ListItemAvatar>
-                                <Avatar
-                                    sx={{
-                                        color: 'error.main',
-                                        bgcolor: 'error.lighter'
-                                    }}
-                                >
-                                    <SettingOutlined />
-                                </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={<Typography variant="subtitle1">Order #988784</Typography>} secondary="7 hours ago" />
-                            <ListItemSecondaryAction>
-                                <Stack alignItems="flex-end">
-                                    <Typography variant="subtitle1" noWrap>
-                                        + $682
-                                    </Typography>
-                                    <Typography variant="h6" color="secondary" noWrap>
-                                        16%
-                                    </Typography>
-                                </Stack>
-                            </ListItemSecondaryAction>
-                        </ListItemButton>
-                    </List>
-                </MainCard>
-                <MainCard sx={{ mt: 2 }}>
-                    <Stack spacing={3}>
-                        <Grid container justifyContent="space-between" alignItems="center">
-                            <Grid item>
-                                <Stack>
-                                    <Typography variant="h5" noWrap>
-                                        Help & Support Chat
-                                    </Typography>
-                                    <Typography variant="caption" color="secondary" noWrap>
-                                        Typical replay within 5 min
-                                    </Typography>
-                                </Stack>
-                            </Grid>
-                            <Grid item>
-                                <AvatarGroup sx={{ '& .MuiAvatar-root': { width: 32, height: 32 } }}>
-                                    <Avatar alt="Remy Sharp" src={avatar1} />
-                                    <Avatar alt="Travis Howard" src={avatar2} />
-                                    <Avatar alt="Cindy Baker" src={avatar3} />
-                                    <Avatar alt="Agnes Walker" src={avatar4} />
-                                </AvatarGroup>
-                            </Grid>
-                        </Grid>
-                        <Button size="small" variant="contained" sx={{ textTransform: 'capitalize' }}>
-                            Need Help?
-                        </Button>
-                    </Stack>
-                </MainCard>
-            </Grid>
+            
         </Grid>
     );
 };

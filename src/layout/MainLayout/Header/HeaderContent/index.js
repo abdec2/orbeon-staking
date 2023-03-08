@@ -45,7 +45,7 @@ const HeaderContent = () => {
                             bgcolor: '#C7C8CC80'
                         }
                     }}>Connect Wallet</Button>
-                    <div style={{width: '1px', height:'28px', background:'#C7C8CC', marginLeft: '9px', marginRight: '20px'}}></div>
+                    <div style={{width: '1px', height:'28px', background:'#C7C8CC', marginLeft: '9px', marginRight: '2px'}}></div>
                     {!matchesXs && <Profile />}
                     {matchesXs && <MobileSection />}
                 </Box>

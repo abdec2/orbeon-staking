@@ -82,7 +82,7 @@ const Profile = () => {
     const iconBackColorOpen = 'grey.300';
 
     return (
-        <Box sx={{ flexShrink: 0, ml: 0.75 }}>
+        <Box sx={{ flexShrink: 0, ml: 2.75 }}>
             <ButtonBase disableRipple
                 sx={{
                     p: 0.25,

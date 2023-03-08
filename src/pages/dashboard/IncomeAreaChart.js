@@ -10,8 +10,8 @@ import ReactApexChart from 'react-apexcharts';
 // chart options
 const areaChartOptions = {
     chart: {
-        height: 450,
-        type: 'area',
+        height: 195,
+        type: 'line',
         toolbar: {
             show: false
         }
@@ -24,7 +24,7 @@ const areaChartOptions = {
         width: 2
     },
     grid: {
-        strokeDashArray: 0
+        strokeDashArray: 10
     }
 };
 
@@ -41,77 +41,67 @@ const IncomeAreaChart = ({ slot }) => {
     useEffect(() => {
         setOptions((prevState) => ({
             ...prevState,
-            colors: [theme.palette.primary.main, theme.palette.primary[700]],
+            colors: ["#F5331E"],
             xaxis: {
                 categories:
-                    slot === 'month'
-                        ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                        : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    ['Dec 16', 'Dec 17', 'Dec 18', 'Dec 19', 'Dec 20', 'Dec 21', 'Dec 22'],
                 labels: {
                     style: {
-                        colors: [
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary,
-                            secondary
-                        ]
+                        colors: ["#000515"],
+                        fontSize: '14px', 
+                        fontFamily: 'Space Grotesk',
+                        lineHeight: '17.86px', 
+                        fontWeight: 400
+
                     }
                 },
                 axisBorder: {
                     show: true,
-                    color: line
+                    color: "#ccc"
                 },
-                tickAmount: slot === 'month' ? 11 : 7
+                tickAmount:  7
             },
             yaxis: {
                 labels: {
+                    formatter: function (value) {
+                        return "$" + value
+                    },
                     style: {
-                        colors: [secondary]
+                        colors: ["#000515"],
+                        fontSize: '14px', 
+                        fontFamily: 'Space Grotesk',
+                        lineHeight: '17.86px', 
+                        fontWeight: 400
                     }
                 }
             },
             grid: {
-                borderColor: line
+                borderColor: '#d5d5d5',
+                
             },
             tooltip: {
                 theme: 'light'
             }
         }));
-    }, [primary, secondary, line, theme, slot]);
+    }, []);
 
     const [series, setSeries] = useState([
         {
-            name: 'Page Views',
-            data: [0, 86, 28, 115, 48, 210, 136]
-        },
-        {
-            name: 'Sessions',
-            data: [0, 43, 14, 56, 24, 105, 68]
+            name: 'Staked',
+            data: [31, 40, 28, 51, 42, 109, 100]
         }
     ]);
 
     useEffect(() => {
         setSeries([
             {
-                name: 'Page Views',
-                data: slot === 'month' ? [76, 85, 101, 98, 87, 105, 91, 114, 94, 86, 115, 35] : [31, 40, 28, 51, 42, 109, 100]
-            },
-            {
-                name: 'Sessions',
-                data: slot === 'month' ? [110, 60, 150, 35, 60, 36, 26, 45, 65, 52, 53, 41] : [11, 32, 45, 32, 34, 52, 41]
+                name: 'Staked',
+                data: [31, 40, 28, 51, 42, 109, 100]
             }
         ]);
     }, [slot]);
 
-    return <ReactApexChart options={options} series={series} type="area" height={450} />;
+    return <ReactApexChart options={options} series={series} type="line" height={195} />;
 };
 
 IncomeAreaChart.propTypes = {
