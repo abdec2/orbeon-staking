@@ -101,7 +101,7 @@ const IncomeAreaChart = ({ slot }) => {
         ]);
     }, [slot]);
 
-    return <ReactApexChart options={options} series={series} type="line" height={195} />;
+    return <ReactApexChart options={options} series={series} type="line" height={205} />;
 };
 
 IncomeAreaChart.propTypes = {
