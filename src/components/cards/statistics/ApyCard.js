@@ -9,6 +9,8 @@ import { CornorRight } from 'components/icons'
 
 // assets
 import { RiseOutlined, FallOutlined } from '@ant-design/icons';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from 'context/GlobalContext';
 
 // ==============================|| STATISTICS - ECOMMERCE CARD  ||============================== //
 
@@ -82,47 +84,59 @@ const styles = {
         }
     }
 }
+const ApyCard = ({ color, title, count = 0, percentage, isLoss, extra }) => {
+    const [apyValue, setApyValue] = useState('');
+    const { blockchainData } = useContext(GlobalContext)
 
-const ApyCard = ({ color, title, count, percentage, isLoss, extra }) => (
-    <MainCard sx={{ mt: { xs: 1, sm: 0 } }}>
-        <Stack spacing={0.5}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant="h6" color="textSecondary">
-                    {title}
-                </Typography>
-                <CornorRight />
-            </Box>
-            <Grid container alignItems="center">
-                <Grid item sx={{width: '100%'}}>
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" >
-                        <Typography variant="h4" color="inherit" sx={{ color: "#000000", fontWeight: 700, fontSize: '24px', lineHeight: '31px' }}>
-                            {count}
-                        </Typography>
-                        <select style={styles.selectBox}>
-                            <optgroup label="ORBN">
-                                <option value="0">1 Month</option>
-                                <option value="1">3 Month</option>
-                                <option value="2">6 Month</option>
-                                <option value="3">9 Month</option>
-                                <option value="4">12 Month</option>
-                            </optgroup>
+    const handleChange = (e) => {
+        setApyValue(blockchainData.apy[e.target.value])
+    }
 
-                            <optgroup label="USDT">
-                                <option value="5">1 Month</option>
-                                <option value="6">3 Month</option>
-                                <option value="7">6 Month</option>
-                                <option value="8">9 Month</option>
-                                <option value="9">12 Month</option>
-                            </optgroup>
-                        </select>
-                    </Stack>
+    useEffect(()=>{
+        setApyValue(blockchainData.apy[0])
+    }, [])
+
+    return (
+        <MainCard sx={{ mt: { xs: 1, sm: 0 } }}>
+            <Stack spacing={0.5}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h6" color="textSecondary">
+                        {title}
+                    </Typography>
+                    <CornorRight />
+                </Box>
+                <Grid container alignItems="center">
+                    <Grid item sx={{ width: '100%' }}>
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" >
+                            <Typography variant="h4" color="inherit" sx={{ color: "#000000", fontWeight: 700, fontSize: '24px', lineHeight: '31px' }}>
+                                {parseFloat(apyValue/100).toFixed(2)+'%'}
+                            </Typography>
+                            <select style={styles.selectBox} onChange={handleChange}>
+                                <optgroup label="ORBN">
+                                    <option value="0">1 Month</option>
+                                    <option value="1">3 Month</option>
+                                    <option value="2">6 Month</option>
+                                    <option value="3">9 Month</option>
+                                    <option value="4">12 Month</option>
+                                </optgroup>
+
+                                <optgroup label="USDT">
+                                    <option value="5">1 Month</option>
+                                    <option value="6">3 Month</option>
+                                    <option value="7">6 Month</option>
+                                    <option value="8">9 Month</option>
+                                    <option value="9">12 Month</option>
+                                </optgroup>
+                            </select>
+                        </Stack>
+                    </Grid>
+
                 </Grid>
+            </Stack>
 
-            </Grid>
-        </Stack>
-
-    </MainCard>
-);
+        </MainCard>
+    )
+};
 
 ApyCard.propTypes = {
     color: PropTypes.string,

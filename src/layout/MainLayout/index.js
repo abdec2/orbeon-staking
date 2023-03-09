@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -14,11 +14,14 @@ import Breadcrumbs from 'components/@extended/Breadcrumbs';
 
 // types
 import { openDrawer } from 'store/reducers/menu';
+import { GlobalContext } from 'context/GlobalContext';
+import Loading from 'components/loadingModals/Loading';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
 const MainLayout = () => {
     const theme = useTheme();
+    const { blockchainData } = useContext(GlobalContext)
     const matchDownLG = useMediaQuery(theme.breakpoints.down('xl'));
     const dispatch = useDispatch();
 
@@ -45,15 +48,18 @@ const MainLayout = () => {
     }, [drawerOpen]);
 
     return (
-        <Box sx={{ display: 'flex', width: '100%' }}>
-            <Header open={open} handleDrawerToggle={handleDrawerToggle} />
-            <Drawer open={open} handleDrawerToggle={handleDrawerToggle} />
-            <Box component="main" sx={{ width: '100%', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-                <Toolbar />
-                <Breadcrumbs navigation={navigation} title titleBottom card={false} divider={false} />
-                <Outlet />
+        <>
+            <Loading loading={blockchainData.loading} />
+            <Box sx={{ display: 'flex', width: '100%' }}>
+                <Header open={open} handleDrawerToggle={handleDrawerToggle} />
+                <Drawer open={open} handleDrawerToggle={handleDrawerToggle} />
+                <Box component="main" sx={{ width: '100%', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+                    <Toolbar />
+                    <Breadcrumbs navigation={navigation} title titleBottom card={false} divider={false} />
+                    <Outlet />
+                </Box>
             </Box>
-        </Box>
+        </>
     );
 };
 

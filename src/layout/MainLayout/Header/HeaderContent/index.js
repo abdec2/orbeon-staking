@@ -7,6 +7,7 @@ import Search from './Search';
 import Profile from './Profile';
 import Notification from './Notification';
 import MobileSection from './MobileSection';
+import { ConnectBtn } from 'components/ConnectBtn';
 
 
 // ==============================|| HEADER - CONTENT ||============================== //
@@ -31,20 +32,7 @@ const HeaderContent = () => {
                 </Typography>
                 <Box sx={{display: 'flex', alignItems: 'center'}}>
                     <div style={{width: '1px', height:'28px', background:'#C7C8CC', marginRight: '9px'}}></div>
-                    <Button sx={{
-                        padding: '8px 22px', 
-                        fontFamily: 'Space Grotesk',
-                        fontSize: '14px',
-                        boxSizing: 'border-box',
-                        background: 'none',
-                        color: '#000515',
-                        fontWeight: 400,
-                        border: '1px solid #000515',
-                        borderRadius: 0, 
-                        '&:hover' : {
-                            bgcolor: '#C7C8CC80'
-                        }
-                    }}>Connect Wallet</Button>
+                    <ConnectBtn />
                     <div style={{width: '1px', height:'28px', background:'#C7C8CC', marginLeft: '9px', marginRight: '2px'}}></div>
                     {!matchesXs && <Profile />}
                     {matchesXs && <MobileSection />}

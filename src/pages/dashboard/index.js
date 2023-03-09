@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 // material-ui
 import {
@@ -38,6 +38,7 @@ import MainCard from 'components/MainCard';
 import StakingDetail from 'components/cards/statistics/StakingDetails';
 import ApyCard from 'components/cards/statistics/ApyCard';
 import { styled } from '@mui/material/styles';
+import TimeComponent from 'components/TimeComponent';
 
 
 // assets
@@ -47,6 +48,7 @@ import avatar2 from 'assets/images/users/avatar-2.png';
 import avatar3 from 'assets/images/users/avatar-3.png';
 import avatar4 from 'assets/images/users/avatar-4.png';
 import { USDT, ORBN } from "components/icons"
+import { GlobalContext } from 'context/GlobalContext';
 
 // avatar style
 const avatarSX = {
@@ -153,16 +155,6 @@ const status = [
     }
 ];
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: '#e5e5e5',
-    borderRadius: 0,
-    paddingTop: '1.25rem',
-    paddingBottom: '1.25rem',
-    textAlign: 'center',
-    boxShadow: 'none',
-    width: '68px'
-}));
-
 const Token = styled(Paper)(({ theme }) => ({
     background: "#ffffff",
     borderRadius: 0,
@@ -175,14 +167,9 @@ const Token = styled(Paper)(({ theme }) => ({
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const DashboardDefault = () => {
-    const [value, setValue] = useState('today');
-    const [slot, setSlot] = useState('week');
-    const [age, setAge] = useState('');
-
-    const handleChange = (event) => {
-        setAge(event.target.value);
-    };
-
+    
+    const { blockchainData } = useContext(GlobalContext)
+    
     return (
         <Grid container rowSpacing={4.5} columnSpacing={3.75} sx={{ paddingTop: '5px' }}>
             {/* row 1 */}
@@ -190,70 +177,15 @@ const DashboardDefault = () => {
                 <StakingDetail title="Total Value Locked" count="$8,674,523.80" />
             </Grid>
             <Grid item xs={12} sm={12} md={4} lg={4}>
-                <ApyCard title="APY Rate" count="97.23%" />
+                <ApyCard title="APY Rate" />
             </Grid>
             <Grid item xs={12} sm={12} md={4} lg={4}>
-                <StakingDetail title="Stakers" count="7538" />
+                <StakingDetail title="Stakers" count={blockchainData.stakers.toString()} />
             </Grid>
 
             {/* row 2 */}
             <Grid item xs={12} md={6} lg={5}>
-                <MainCard >
-                    <Box>
-                        <Stack direction="row" alignItems="center" justifyContent="space-between">
-                            <Typography variant="h4" >Lock Period</Typography>
-                            <select style={styles.selectBox}>
-                                <optgroup label="ORBN">
-                                    <option value="0">1 Month</option>
-                                    <option value="1">3 Month</option>
-                                    <option value="2">6 Month</option>
-                                    <option value="3">9 Month</option>
-                                    <option value="4">12 Month</option>
-                                </optgroup>
-
-                                <optgroup label="USDT">
-                                    <option value="5">1 Month</option>
-                                    <option value="6">3 Month</option>
-                                    <option value="7">6 Month</option>
-                                    <option value="8">9 Month</option>
-                                    <option value="9">12 Month</option>
-                                </optgroup>
-
-                            </select>
-                        </Stack>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', pt: 4.5, pb: 7, pl: 1, pr: 1, flexDirection: 'column' }}>
-                            <Stack spacing={1}>
-                                <Typography variant="p" sx={styles.lockPeriod}>Monday</Typography>
-                                <Typography variant="p" sx={styles.lockPeriod}>Monday Dec 26,2022</Typography>
-                            </Stack>
-                            <Stack
-                                direction="row"
-                                divider={<Divider />}
-                                spacing={1.5}
-                                sx={{ mt: '16px' }}
-                                alignItems='center'
-                            >
-                                <Item>
-                                    <Typography variant="h3" sx={styles.timer} >04</Typography>
-                                    <Typography variant="h3" sx={styles.timeCat} >Days</Typography>
-                                </Item>
-                                <Item>
-                                    <Typography variant="h3" sx={styles.timer} >16</Typography>
-                                    <Typography variant="h3" sx={styles.timeCat} >Hours</Typography>
-                                </Item>
-                                <Item>
-                                    <Typography variant="h3" sx={styles.timer} >24</Typography>
-                                    <Typography variant="h3" sx={styles.timeCat} >Minutes</Typography>
-                                </Item>
-                                <Item>
-                                    <Typography variant="h3" sx={styles.timer} >28</Typography>
-                                    <Typography variant="h3" sx={styles.timeCat} >Seconds</Typography>
-                                </Item>
-                            </Stack>
-                            <Typography variant="p" sx={styles.lockAmount}>$20,000.00 USDT</Typography>
-                        </Box>
-                    </Box>
-                </MainCard>
+              <TimeComponent />
             </Grid>
             <Grid item xs={12} md={6} lg={7}>
                 <MainCard>
