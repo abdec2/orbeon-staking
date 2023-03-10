@@ -27,6 +27,12 @@ export const AppReducer = (state, action) => {
                 ...state,
                 loading: action.payload
             }
+        
+        case 'UPDATE_POOLS':
+            return {
+                ...state,
+                pools: action.payload
+            }
         default:
             return state;
     };

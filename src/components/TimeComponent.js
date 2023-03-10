@@ -1,27 +1,24 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import MainCard from './MainCard'
 import { Box, Stack, Typography, Divider, Paper } from "@mui/material"
-import { styled } from '@mui/material/styles';
+
 import useAccountData from 'hooks/useAccountData';
 import { GlobalContext } from 'context/GlobalContext';
-
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: '#e5e5e5',
-    borderRadius: 0,
-    paddingTop: '1.25rem',
-    paddingBottom: '1.25rem',
-    textAlign: 'center',
-    boxShadow: 'none',
-    width: '68px'
-}));
+import { useAccount } from 'wagmi';
+import Countdown from './Countdown';
 
 const TimeComponent = () => {
+    const { address, isConnected } = useAccount()
     const daysInWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     const { blockchainData } = useContext(GlobalContext)
+    const [opt, setOpt] = useState(0)
     const userData = useAccountData()
     console.log(blockchainData)
 
-    
+    const deadline = (parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[0]?.duration.toString())) * 1000
+
+
+
     const styles = {
         lockPeriod: {
             textAlign: 'center',
@@ -36,7 +33,7 @@ const TimeComponent = () => {
             fontWeight: 600,
             fontSize: '32px',
             lineHeight: '23px'
-    
+
         },
         timeCat: {
             color: '#000515',
@@ -92,12 +89,17 @@ const TimeComponent = () => {
             }
         }
     }
+
+    const handleChange = (e) => {
+        setOpt(e.target.value)
+    }
+
     return (
         <MainCard >
             <Box>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <Typography variant="h4" >Lock Period</Typography>
-                    <select style={styles.selectBox}>
+                    <select style={styles.selectBox} onChange={handleChange}>
                         <optgroup label="ORBN">
                             <option value="0">1 Month</option>
                             <option value="1">3 Month</option>
@@ -118,33 +120,11 @@ const TimeComponent = () => {
                 </Stack>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', pt: 4.5, pb: 7, pl: 1, pr: 1, flexDirection: 'column' }}>
                     <Stack spacing={1}>
-                        <Typography variant="p" sx={styles.lockPeriod}>{daysInWeek[new Date().getDay()]}</Typography>
-                        <Typography variant="p" sx={styles.lockPeriod}>{new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(new Date())}</Typography>
+                        <Typography variant="p" sx={styles.lockPeriod}>{daysInWeek[new Date(deadline).getDay()]}</Typography>
+                        <Typography variant="p" sx={styles.lockPeriod}>{new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(new Date(deadline))}</Typography>
                     </Stack>
-                    <Stack
-                        direction="row"
-                        divider={<Divider />}
-                        spacing={1.5}
-                        sx={{ mt: '16px' }}
-                        alignItems='center'
-                    >
-                        <Item>
-                            <Typography variant="h3" sx={styles.timer} >04</Typography>
-                            <Typography variant="h3" sx={styles.timeCat} >Days</Typography>
-                        </Item>
-                        <Item>
-                            <Typography variant="h3" sx={styles.timer} >16</Typography>
-                            <Typography variant="h3" sx={styles.timeCat} >Hours</Typography>
-                        </Item>
-                        <Item>
-                            <Typography variant="h3" sx={styles.timer} >24</Typography>
-                            <Typography variant="h3" sx={styles.timeCat} >Minutes</Typography>
-                        </Item>
-                        <Item>
-                            <Typography variant="h3" sx={styles.timer} >28</Typography>
-                            <Typography variant="h3" sx={styles.timeCat} >Seconds</Typography>
-                        </Item>
-                    </Stack>
+                    {/* Countdown */}
+                    <Countdown deadline={parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[0]?.duration.toString())} />
                     <Typography variant="p" sx={styles.lockAmount}>$20,000.00 USDT</Typography>
                 </Box>
             </Box>

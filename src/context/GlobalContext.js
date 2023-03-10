@@ -39,7 +39,8 @@ const initialState = {
         8: "1200",
         9: "1800",
     },
-    userStakes: []
+    userStakes: [],
+    pools: []
 }
 
 export const GlobalContext = createContext(initialState)
@@ -131,6 +132,7 @@ export const GlobalProvider = ({ children }) => {
                 apyObj[i] = item.apy.toString()
             })
             UpdateApy(apyObj)
+            updatePools(data)
         },
       
     })
@@ -170,6 +172,13 @@ export const GlobalProvider = ({ children }) => {
         })
     }
 
+    const updatePools = (pools) => {
+        dispatch({
+            type: 'UPDATE_POOLS',
+            payload: pools
+        })
+    }
+
     const fetchData = async () => {
 
     }
@@ -190,7 +199,8 @@ export const GlobalProvider = ({ children }) => {
                 UpdateApy,
                 updateUserStakes,
                 updateStakers,
-                updateLoading
+                updateLoading,
+                updatePools
             }
         }
         >
