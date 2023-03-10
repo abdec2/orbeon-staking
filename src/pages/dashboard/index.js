@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 
 // material-ui
 import {
@@ -169,6 +169,17 @@ const Token = styled(Paper)(({ theme }) => ({
 const DashboardDefault = () => {
     
     const { blockchainData } = useContext(GlobalContext)
+    const amount = useRef()
+    const pid = useRef()
+
+    const handleRewards = async () => {
+        console.log('amount', amount)
+        console.log('pid', pid)
+    }
+
+    const handleStake = async () => {
+
+    }
     
     return (
         <Grid container rowSpacing={4.5} columnSpacing={3.75} sx={{ paddingTop: '5px' }}>
@@ -218,11 +229,11 @@ const DashboardDefault = () => {
                     <Grid container>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 2, sm: { mb: 0 } }}>
                             <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }} >Amount to Stake</Typography>
-                            <input style={{ ...styles.txtInput }} placeholder="Amount" />
+                            <input ref={amount} style={{ ...styles.txtInput }} placeholder="Amount" />
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 2, sm: { mb: 0 } }}>
                             <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }} >Lock Options</Typography>
-                            <select style={{ ...styles.txtInput }}>
+                            <select ref={pid} style={{ ...styles.txtInput }}>
                                 <optgroup label="ORBN">
                                     <option value="0">1 Month</option>
                                     <option value="1">3 Month</option>
@@ -254,10 +265,10 @@ const DashboardDefault = () => {
                     </Box>
                     <Grid container>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 0.5 }}>
-                            <Button sx={{ ...styles.btn }}>Claim Rewards</Button>
+                            <Button sx={{ ...styles.btn }} onClick={handleRewards}>Claim Rewards</Button>
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 0.5 }}>
-                            <Button sx={{ ...styles.btn }}>Stake</Button>
+                            <Button sx={{ ...styles.btn }} onClick={handleStake}>Stake</Button>
                         </Grid>
                     </Grid>
 
