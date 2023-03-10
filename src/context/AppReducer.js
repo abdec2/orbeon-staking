@@ -33,6 +33,12 @@ export const AppReducer = (state, action) => {
                 ...state,
                 pools: action.payload
             }
+
+        case 'UPDATE_REWARDS':
+            return {
+                ...state,
+                rewards: action.payload
+            }
         default:
             return state;
     };

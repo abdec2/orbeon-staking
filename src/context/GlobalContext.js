@@ -40,7 +40,8 @@ const initialState = {
         9: "1800",
     },
     userStakes: [],
-    pools: []
+    pools: [], 
+    rewards: []
 }
 
 export const GlobalContext = createContext(initialState)
@@ -179,6 +180,13 @@ export const GlobalProvider = ({ children }) => {
         })
     }
 
+    const updateRewards = (rewards) => {
+        dispatch({
+            type: 'UPDATE_REWARDS',
+            payload: rewards
+        })
+    }
+
     const fetchData = async () => {
 
     }
@@ -200,7 +208,8 @@ export const GlobalProvider = ({ children }) => {
                 updateUserStakes,
                 updateStakers,
                 updateLoading,
-                updatePools
+                updatePools,
+                updateRewards
             }
         }
         >

@@ -6,19 +6,32 @@ import useAccountData from 'hooks/useAccountData';
 import { GlobalContext } from 'context/GlobalContext';
 import { useAccount } from 'wagmi';
 import Countdown from './Countdown';
+import useGetRewards from 'hooks/useGetRewards';
+import { ethers } from '../../node_modules/ethers/lib/index';
+import { CONFIG } from 'configs/config';
 
 const TimeComponent = () => {
     const { address, isConnected } = useAccount()
     const daysInWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     const { blockchainData } = useContext(GlobalContext)
     const [opt, setOpt] = useState(0)
-    const userData = useAccountData()
+    useAccountData()
+    useGetRewards()
     console.log(blockchainData)
 
-    const deadline = (parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[0]?.duration.toString())) * 1000
+    let symbol = opt < 5 ? "ORBN" : "USDT"
+    let decimals = opt < 5 ? CONFIG.ORBN_DECIMALS : CONFIG.USDT_DECIMALS
 
+    let deadline = blockchainData.userStakes.length > 0 ? (parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[0]?.duration.toString())) * 1000 : 0
+    deadline = isNaN(deadline) ? 0 : deadline
+    console.log(deadline)
 
+    let stakeAmount = blockchainData.userStakes.length > 0 ? (parseInt(blockchainData?.userStakes[opt]?.amount.toString())) : 0
+    stakeAmount = isNaN(stakeAmount) ? 0 : stakeAmount
 
+    let rewardsEarned = blockchainData.rewards.length > 0 ? (parseInt(blockchainData?.rewards[opt].toString())) : 0
+    rewardsEarned = isNaN(rewardsEarned) ? 0 : rewardsEarned
+ 
     const styles = {
         lockPeriod: {
             textAlign: 'center',
@@ -45,7 +58,7 @@ const TimeComponent = () => {
             textAlign: 'center',
             fontFamily: 'Space Grotesk',
             fontWeight: 500,
-            fontSize: '18px',
+            fontSize: '16px',
             lineHeight: '16px',
             color: '#000515',
             opacity: 0.7,
@@ -118,14 +131,15 @@ const TimeComponent = () => {
 
                     </select>
                 </Stack>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', pt: 4.5, pb: 7, pl: 1, pr: 1, flexDirection: 'column' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', pt: 4.5, pb: 3.5, pl: 1, pr: 1, flexDirection: 'column' }}>
                     <Stack spacing={1}>
                         <Typography variant="p" sx={styles.lockPeriod}>{daysInWeek[new Date(deadline).getDay()]}</Typography>
                         <Typography variant="p" sx={styles.lockPeriod}>{new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(new Date(deadline))}</Typography>
                     </Stack>
                     {/* Countdown */}
-                    <Countdown deadline={parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[0]?.duration.toString())} />
-                    <Typography variant="p" sx={styles.lockAmount}>$20,000.00 USDT</Typography>
+                    <Countdown deadline={deadline} />
+                    <Typography variant="p" sx={styles.lockAmount}>Token Staked: {ethers.utils.formatUnits(stakeAmount,decimals) + " "+symbol} </Typography>
+                    <Typography variant="p" sx={{...styles.lockAmount, mt:1.5}}>Rewards Earned: {ethers.utils.formatUnits(rewardsEarned, CONFIG.ORBN_DECIMALS)} ORBN</Typography>
                 </Box>
             </Box>
         </MainCard>

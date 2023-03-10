@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 // material-ui
 import {
@@ -39,6 +39,7 @@ import StakingDetail from 'components/cards/statistics/StakingDetails';
 import ApyCard from 'components/cards/statistics/ApyCard';
 import { styled } from '@mui/material/styles';
 import TimeComponent from 'components/TimeComponent';
+import { AlertMsg } from 'components/AlertMsg'
 
 
 // assets
@@ -49,6 +50,12 @@ import avatar3 from 'assets/images/users/avatar-3.png';
 import avatar4 from 'assets/images/users/avatar-4.png';
 import { USDT, ORBN } from "components/icons"
 import { GlobalContext } from 'context/GlobalContext';
+import { CONFIG } from 'configs/config';
+import { ethers } from 'ethers';
+import { useDebounce } from 'usehooks-ts';
+import { useAccount, useContractWrite, useWaitForTransaction } from '../../../node_modules/wagmi/dist/index';
+import { useConnectModal } from '../../../node_modules/@rainbow-me/rainbowkit/dist/index';
+import { usePrepareWriteForStaking, usePrepareWriteForTokens } from 'hooks/myhooks';
 
 // avatar style
 const avatarSX = {
@@ -121,10 +128,24 @@ const styles = {
         fontSize: '16px',
         borderRadius: 0,
         color: "#fff",
-        py: 2,
+        py: 1.8,
         px: 2,
         '&:hover': {
             bgcolor: "#ff7262"
+        }
+    },
+    btn1: {
+        width: '100%',
+        bgcolor: '#e5e5e5',
+        fontFamily: 'Space Grotesk',
+        fontSize: '16px',
+        borderRadius: 0,
+        border: '1px solid #000515',
+        color: "#000515",
+        py: 1.8,
+        px: 2,
+        '&:hover': {
+            bgcolor: "#C7C8CC"
         }
     }
 }
@@ -167,19 +188,95 @@ const Token = styled(Paper)(({ theme }) => ({
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const DashboardDefault = () => {
-    
-    const { blockchainData } = useContext(GlobalContext)
-    const amount = useRef()
-    const pid = useRef()
+    const {address, isConnected} = useAccount()
+    const { openConnectModal } = useConnectModal()
+    const { blockchainData, updateLoading } = useContext(GlobalContext)
+    const txtAmount = useRef()
+    const selPid = useRef()
+    const [tAmount, setTamount] = useState('')
+    const [pid, setPid] = useState('')
+    const [lpToken, setLpToken] = useState('')
+    const debouncedAmount = useDebounce(tAmount, 500)
+    const debouncedToken = useDebounce(lpToken, 500)
+    const debouncedPid = useDebounce(pid, 500)
+    const approveConfig = usePrepareWriteForTokens(debouncedToken, debouncedAmount)
+    const stakeConfig = usePrepareWriteForStaking(debouncedPid, debouncedAmount)
+    const stakeWrite = useContractWrite({
+        ...stakeConfig,
+        onError(err) {
+            updateLoading(false)
+        }
+    })
+    const approveWrite = useContractWrite({
+        ...approveConfig,
+        onError(err) {
+            updateLoading(false)
+        }
+    })
+
+    const approveWait = useWaitForTransaction({
+        hash: approveWrite.data?.hash,
+    })
+    const stakingWait = useWaitForTransaction({
+        hash: stakeWrite.data?.hash
+    })
 
     const handleRewards = async () => {
-        console.log('amount', amount)
-        console.log('pid', pid)
     }
 
     const handleStake = async () => {
-
+        if(!isConnected) {
+            openConnectModal()
+            return
+        }
+        const _pid = selPid.current.value
+        let amount = txtAmount.current.value
+        if(_pid == "") {
+            AlertMsg({title: 'Oops!', msg: 'Select Lock Options', icon: 'error'})
+            return
+        }
+        if(amount == "") {
+            AlertMsg({title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error'})
+            return
+        }
+        const decimal = parseInt(_pid) < 5 ? CONFIG.ORBN_DECIMALS : CONFIG.USDT_DECIMALS
+        const tokenAddress = parseInt(_pid) < 5 ? CONFIG.ORBN_ADDRESS : CONFIG.USDT_ADDRESS
+        try {
+            amount = ethers.utils.parseUnits(amount, decimal)
+        } catch(e) {
+            AlertMsg({title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error'})
+            return
+        }
+        setTamount(amount)
+        setLpToken(tokenAddress)
+        setPid(_pid)
+        updateLoading(true)
+        console.log(decimal)
+        try {
+            approveWrite.write()
+        } catch(e) {
+            updateLoading(false)
+            AlertMsg({title: 'Oops!', msg: 'Something went wrong', icon: 'error'})
+        }
+        
     }
+
+    const handleWithdraw = async () => {
+        
+    }
+
+    useEffect(()=> {
+        if(approveWait.isSuccess) {
+            // updateLoading(false)
+            stakeWrite.write()
+            // AlertMsg({title: 'Congrates!', msg: 'Your Transaction has been completed successfully', icon: 'success'})
+        }
+        if(stakingWait.isSuccess) {
+            updateLoading(false)
+            AlertMsg({title: 'Congrates!', msg: 'Your Transaction has been completed successfully', icon: 'success'})
+        }
+
+    }, [approveWait.isSuccess, stakingWait.isSuccess, approveWait.isLoading, stakingWait.isLoading ])
     
     return (
         <Grid container rowSpacing={4.5} columnSpacing={3.75} sx={{ paddingTop: '5px' }}>
@@ -229,12 +326,13 @@ const DashboardDefault = () => {
                     <Grid container>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 2, sm: { mb: 0 } }}>
                             <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }} >Amount to Stake</Typography>
-                            <input ref={amount} style={{ ...styles.txtInput }} placeholder="Amount" />
+                            <input ref={txtAmount} style={{ ...styles.txtInput }} placeholder="Amount" />
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 2, sm: { mb: 0 } }}>
                             <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }} >Lock Options</Typography>
-                            <select ref={pid} style={{ ...styles.txtInput }}>
+                            <select style={{ ...styles.txtInput }} ref={selPid}>
                                 <optgroup label="ORBN">
+                                    <option value="">Select Lock Period</option>
                                     <option value="0">1 Month</option>
                                     <option value="1">3 Month</option>
                                     <option value="2">6 Month</option>
@@ -253,23 +351,28 @@ const DashboardDefault = () => {
                         </Grid>
                     </Grid>
                     <Box sx={{ px: 1, mb: 2 }}>
-                        <Typography variant="h4" sx={{ fontWeight: 700 }} >Select Token</Typography>
+                        {/* <Typography variant="h4" sx={{ fontWeight: 700 }} >Rewards Earned</Typography>
                         <RadioGroup
                             row
                             aria-labelledby="demo-row-radio-buttons-group-label"
                             name="row-radio-buttons-group"
                         >
-                            <FormControlLabel value="ORBN" control={<Radio sx={{ color: '#F5331E', '&.Mui-checked': { color: "#F5331E" } }} />} label="ORBN" />
-                            <FormControlLabel value="USDT" control={<Radio sx={{ color: '#F5331E', '&.Mui-checked': { color: "#F5331E" } }} />} label="USDT" />
-                        </RadioGroup>
+                            <FormControlLabel value="ORBN" control={<Radio sx={{ color: '#F5331E', '&.Mui-checked': { color: "#F5331E" } }} />} label="ORBN" onChange={handleTokenChange} />
+                            <FormControlLabel value="USDT" control={<Radio sx={{ color: '#F5331E', '&.Mui-checked': { color: "#F5331E" } }} />} label="USDT" onChange={handleTokenChange} />
+                        </RadioGroup> */}
+                        
                     </Box>
-                    <Grid container>
+                    <Grid container spacing={1.3}>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 0.5 }}>
-                            <Button sx={{ ...styles.btn }} onClick={handleRewards}>Claim Rewards</Button>
+                            <Button sx={{ ...styles.btn1 }} onClick={handleRewards}>Claim Rewards</Button>
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 0.5 }}>
+                            <Button sx={{ ...styles.btn1 }} onClick={handleWithdraw}>Withdraw Stake</Button>
+                        </Grid>
+                        <Grid item xs={12} sm={12} sx={{ px: 1, mb: 0.4 }}>
                             <Button sx={{ ...styles.btn }} onClick={handleStake}>Stake</Button>
                         </Grid>
+                        
                     </Grid>
 
                 </MainCard>
