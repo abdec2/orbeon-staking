@@ -48,7 +48,7 @@ export const GlobalContext = createContext(initialState)
 
 export const GlobalProvider = ({ children }) => {
     const [state, dispatch] = useReducer(AppReducer, initialState)
-    const { data, isError, isLoading } = useContractReads({
+    const { data, isError, isLoading, refetch } = useContractReads({
         contracts: [
             {
                 ...orbnContract, 
@@ -60,17 +60,13 @@ export const GlobalProvider = ({ children }) => {
                 functionName: 'balanceOf',
                 args: [CONFIG.STAKING_CONTRACT]
             },
-            {
-                ...stakingContract, 
-                functionName: 'stakeHoldersLength'
-            },
+            
         ], 
         onSuccess(data) {
             updateLockedTokens({
                 orbn: ethers.utils.formatUnits(data[0].toString(), CONFIG.ORBN_DECIMALS),
                 usdt: ethers.utils.formatUnits(data[1].toString(), CONFIG.ORBN_DECIMALS)
             })
-            updateStakers(data[2].toString())
         },      
     })
     const {data:apy, isError:apy_err, isLoading:apy_loading} = useContractReads({
@@ -138,6 +134,68 @@ export const GlobalProvider = ({ children }) => {
       
     })
 
+    const stakeHoldersCR = useContractReads({
+        contracts: [
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [0]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [1]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [2]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [3]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [4]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [5]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [6]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [7]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [8]
+            },
+            {
+                ...stakingContract, 
+                functionName: 'stakeHoldersLength', 
+                args: [9]
+            },
+        ],
+        onSuccess(data) {
+            let noOfStakers = 0
+            data.map(item => {
+                noOfStakers += parseInt(item.toString())
+            })
+            updateStakers(noOfStakers)
+        }, 
+    }) 
+
     const updateLockedTokens = (lockedTokens) => {
         dispatch({
             type: 'UPDATE_LOCKED_TOKENS',
@@ -188,7 +246,8 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const fetchData = async () => {
-
+        refetch()
+        stakeHoldersCR.refetch()
     }
 
     useEffect(() => {
@@ -209,7 +268,8 @@ export const GlobalProvider = ({ children }) => {
                 updateStakers,
                 updateLoading,
                 updatePools,
-                updateRewards
+                updateRewards,
+                fetchData
             }
         }
         >

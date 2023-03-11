@@ -1,12 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import MainCard from './MainCard'
 import { Box, Stack, Typography, Divider, Paper } from "@mui/material"
 
-import useAccountData from 'hooks/useAccountData';
 import { GlobalContext } from 'context/GlobalContext';
 import { useAccount } from 'wagmi';
 import Countdown from './Countdown';
-import useGetRewards from 'hooks/useGetRewards';
 import { ethers } from '../../node_modules/ethers/lib/index';
 import { CONFIG } from 'configs/config';
 
@@ -15,14 +13,13 @@ const TimeComponent = () => {
     const daysInWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     const { blockchainData } = useContext(GlobalContext)
     const [opt, setOpt] = useState(0)
-    useAccountData()
-    useGetRewards()
+    
     console.log(blockchainData)
 
     let symbol = opt < 5 ? "ORBN" : "USDT"
     let decimals = opt < 5 ? CONFIG.ORBN_DECIMALS : CONFIG.USDT_DECIMALS
 
-    let deadline = blockchainData.userStakes.length > 0 ? (parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[0]?.duration.toString())) * 1000 : 0
+    let deadline = blockchainData.userStakes.length > 0 ? (parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[opt]?.duration.toString())) * 1000 : 0
     deadline = isNaN(deadline) ? 0 : deadline
     console.log(deadline)
 
@@ -106,6 +103,7 @@ const TimeComponent = () => {
     const handleChange = (e) => {
         setOpt(e.target.value)
     }
+
 
     return (
         <MainCard >

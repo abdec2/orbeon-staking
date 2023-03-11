@@ -40,8 +40,8 @@ contract MasterChef is Ownable, ReentrancyGuard {
     // Info of each pool.
     PoolInfo[] public poolInfo;
 
-    // Stakers Address
-    address[] public stakeHolders;
+    // mapping of stakeholder address by pool id
+    mapping(uint256 => address[]) public stakeHolders;
 
     // Info of each user that stakes LP tokens.
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
@@ -65,8 +65,8 @@ contract MasterChef is Ownable, ReentrancyGuard {
         return poolInfo.length;
     }
 
-    function stakeHoldersLength() external view returns (uint256) {
-        return stakeHolders.length;
+    function stakeHoldersLength(uint256 _pid) external view returns (uint256) {
+        return stakeHolders[_pid].length;
     }
 
     function initializePools(IERC20 _lptoken1, IERC20 _lptoken2) external onlyOwner {
@@ -121,8 +121,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
             uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
             // calculate Rewards (totalSupply x apy / 10000) / 1year
-            uint rewardspersecond = lpSupply.mul(pool.apy).div(10000).div(rewardDuration);
-            uint256 tokenReward = multiplier.mul(rewardspersecond);
+            uint256 tokenReward = lpSupply.mul(pool.apy).mul(multiplier).div(10000).div(rewardDuration);
             accTokenPerShare = accTokenPerShare.add(tokenReward.mul(1e18).div(lpSupply)); // tokenReward.mul(1e12).div(lpSupply)
         }
         uint256 pending = user.amount.mul(accTokenPerShare).div(1e18).sub(user.rewardDebt);
@@ -149,8 +148,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
             return;
         }
         uint256 multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
-        uint rewardspersecond = lpSupply.mul(pool.apy).div(10000).div(rewardDuration);
-        uint256 tokenReward = multiplier.mul(rewardspersecond);
+        uint256 tokenReward = lpSupply.mul(pool.apy).mul(multiplier).div(10000).div(rewardDuration);
         
         pool.accTokenPerShare = pool.accTokenPerShare.add(tokenReward.mul(1e18).div(lpSupply));
         pool.lastRewardTime = block.timestamp;
@@ -165,7 +163,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         LockupPendingToken(_pid);
         if (_amount > 0) {
             if( user.amount == 0 ) {
-                addStakeholder(msg.sender);
+                addStakeholder(msg.sender, _pid);
                 user.timestamp = block.timestamp;
             }
             pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
@@ -190,7 +188,8 @@ contract MasterChef is Ownable, ReentrancyGuard {
             pool.lpToken.safeTransfer(address(msg.sender), _amount);
         }
         if ( user.amount == 0 ) {
-            removeStakeholder(msg.sender);
+            removeStakeholder(msg.sender, _pid);
+            user.timestamp = 0;
         }
 
         user.rewardDebt = user.amount.mul(pool.accTokenPerShare).div(1e18);
@@ -247,33 +246,33 @@ contract MasterChef is Ownable, ReentrancyGuard {
         return block.timestamp >= user.timestamp.add(pool.duration);
     }
 
-    function isStakeholder(address _address)
+    function isStakeholder(address _address, uint256 _pid)
         internal
         view
         returns(bool, uint256)
     {
-        for (uint256 s = 0; s < stakeHolders.length; s += 1){
-            if (_address == stakeHolders[s]) return (true, s);
+        for (uint256 s = 0; s < stakeHolders[_pid].length; s += 1){
+            if (_address == stakeHolders[_pid][s]) return (true, s);
         }
         return (false, 0);
     }
 
    
-    function addStakeholder(address _stakeholder)
+    function addStakeholder(address _stakeholder, uint256 _pid)
         internal
     {
-        (bool _isStakeholder, ) = isStakeholder(_stakeholder);
-        if(!_isStakeholder) stakeHolders.push(_stakeholder);
+        (bool _isStakeholder, ) = isStakeholder(_stakeholder, _pid);
+        if(!_isStakeholder) stakeHolders[_pid].push(_stakeholder);
     }
 
     
-    function removeStakeholder(address _stakeholder)
+    function removeStakeholder(address _stakeholder, uint)
         internal
     {
-        (bool _isStakeholder, uint256 s) = isStakeholder(_stakeholder);
+        (bool _isStakeholder, uint256 s) = isStakeholder(_stakeholder, _pid);
         if(_isStakeholder){
-            stakeHolders[s] = stakeHolders[stakeHolders.length - 1];
-            stakeHolders.pop();
+            stakeHolders[_pid][s] = stakeHolders[_pid][stakeHolders[_pid].length - 1];
+            stakeHolders[_pid].pop();
         } 
     }
  

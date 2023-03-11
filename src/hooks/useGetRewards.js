@@ -78,7 +78,7 @@ const useGetRewards = () => {
         } 
     }, [isConnected, address])
 
-    return data
+    return refetch
 }
 
 export default useGetRewards

@@ -78,7 +78,7 @@ const useAccountData = () => {
         } 
     }, [isConnected, address])
 
-    return data
+    return refetch
 }
 
 export default useAccountData

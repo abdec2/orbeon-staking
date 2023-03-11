@@ -26,36 +26,27 @@ import {
     FormControlLabel
 } from '@mui/material';
 
-import { Divider } from 'components/icons'
-
 // project import
-import OrdersTable from './OrdersTable';
 import IncomeAreaChart from './IncomeAreaChart';
-import MonthlyBarChart from './MonthlyBarChart';
-import ReportAreaChart from './ReportAreaChart';
-import SalesColumnChart from './SalesColumnChart';
 import MainCard from 'components/MainCard';
 import StakingDetail from 'components/cards/statistics/StakingDetails';
 import ApyCard from 'components/cards/statistics/ApyCard';
 import { styled } from '@mui/material/styles';
 import TimeComponent from 'components/TimeComponent';
 import { AlertMsg } from 'components/AlertMsg'
+import StakeAbi from './../../configs/staking.json'
+import TokenAbi from './../../configs/token.json'
 
 
 // assets
-import { GiftOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons';
-import avatar1 from 'assets/images/users/avatar-1.png';
-import avatar2 from 'assets/images/users/avatar-2.png';
-import avatar3 from 'assets/images/users/avatar-3.png';
-import avatar4 from 'assets/images/users/avatar-4.png';
 import { USDT, ORBN } from "components/icons"
 import { GlobalContext } from 'context/GlobalContext';
 import { CONFIG } from 'configs/config';
 import { ethers } from 'ethers';
-import { useDebounce } from 'usehooks-ts';
-import { useAccount, useContractWrite, useWaitForTransaction } from '../../../node_modules/wagmi/dist/index';
-import { useConnectModal } from '../../../node_modules/@rainbow-me/rainbowkit/dist/index';
-import { usePrepareWriteForStaking, usePrepareWriteForTokens } from 'hooks/myhooks';
+import { useAccount, useSigner } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import useAccountData from 'hooks/useAccountData';
+import useGetRewards from 'hooks/useGetRewards';
 
 // avatar style
 const avatarSX = {
@@ -188,96 +179,149 @@ const Token = styled(Paper)(({ theme }) => ({
 // ==============================|| DASHBOARD - DEFAULT ||============================== //
 
 const DashboardDefault = () => {
-    const {address, isConnected} = useAccount()
+    const { address, isConnected } = useAccount()
+    const { data: signer } = useSigner()
     const { openConnectModal } = useConnectModal()
-    const { blockchainData, updateLoading } = useContext(GlobalContext)
+    const { blockchainData, updateLoading, fetchData } = useContext(GlobalContext)
     const txtAmount = useRef()
     const selPid = useRef()
-    const [tAmount, setTamount] = useState('')
-    const [pid, setPid] = useState('')
-    const [lpToken, setLpToken] = useState('')
-    const debouncedAmount = useDebounce(tAmount, 500)
-    const debouncedToken = useDebounce(lpToken, 500)
-    const debouncedPid = useDebounce(pid, 500)
-    const approveConfig = usePrepareWriteForTokens(debouncedToken, debouncedAmount)
-    const stakeConfig = usePrepareWriteForStaking(debouncedPid, debouncedAmount)
-    const stakeWrite = useContractWrite({
-        ...stakeConfig,
-        onError(err) {
-            updateLoading(false)
-        }
-    })
-    const approveWrite = useContractWrite({
-        ...approveConfig,
-        onError(err) {
-            updateLoading(false)
-        }
-    })
 
-    const approveWait = useWaitForTransaction({
-        hash: approveWrite.data?.hash,
-    })
-    const stakingWait = useWaitForTransaction({
-        hash: stakeWrite.data?.hash
-    })
+    const refetchAccountData = useAccountData()
+    const refetchRewards = useGetRewards()
 
     const handleRewards = async () => {
+        if (!isConnected) {
+            openConnectModal()
+            return
+        }
+        const _pid = selPid.current.value
+        if (_pid == "") {
+            AlertMsg({ title: 'Oops!', msg: 'Select Lock Options', icon: 'error' })
+            return
+        }
+
+        try {
+            updateLoading(true)
+            const contract = new ethers.Contract(CONFIG.STAKING_CONTRACT, StakeAbi, signer)
+            const estimate = await contract.estimateGas.getRewards(_pid)
+            const rewardsTx = await contract.getRewards(_pid, { gasLimit: estimate.toString() })
+            await rewardsTx.wait()
+            console.log(rewardsTx)
+            updateLoading(false)
+            fetchData()
+            refetchAccountData()
+            refetchRewards()
+            AlertMsg({ title: 'Congratulation!', msg: 'Your transaction has been completed successfully', icon: 'success' })
+        } catch (e) {
+            updateLoading(false)
+            AlertMsg({ title: 'Oops!', msg: 'Something went wrong', icon: 'error' })
+        }
+    }
+
+    const approve = async (amount, tokenAddress) => {
+        const contract = new ethers.Contract(tokenAddress, TokenAbi, signer)
+        const estimate = await contract.estimateGas.increaseAllowance(CONFIG.STAKING_CONTRACT, amount)
+        const approveTx = await contract.increaseAllowance(CONFIG.STAKING_CONTRACT, amount, { gasLimit: estimate.toString() })
+        await approveTx.wait()
+        console.log(approveTx)
+    }
+
+    const deposit = async (pid, amount) => {
+        const contract = new ethers.Contract(CONFIG.STAKING_CONTRACT, StakeAbi, signer)
+        const estimate = await contract.estimateGas.deposit(pid, amount)
+        const stakeTx = await contract.deposit(pid, amount, { gasLimit: estimate.toString() })
+        await stakeTx.wait()
+        console.log(stakeTx)
+    }
+
+    const withdraw = async (pid, amount) => {
+        const contract = new ethers.Contract(CONFIG.STAKING_CONTRACT, StakeAbi, signer)
+        const estimate = await contract.estimateGas.exit(pid, amount)
+        const stakeTx = await contract.exit(pid, amount, { gasLimit: estimate.toString() })
+        await stakeTx.wait()
+        console.log(stakeTx)
     }
 
     const handleStake = async () => {
-        if(!isConnected) {
+        if (!isConnected) {
             openConnectModal()
             return
         }
         const _pid = selPid.current.value
         let amount = txtAmount.current.value
-        if(_pid == "") {
-            AlertMsg({title: 'Oops!', msg: 'Select Lock Options', icon: 'error'})
+        if (_pid == "") {
+            AlertMsg({ title: 'Oops!', msg: 'Select Lock Options', icon: 'error' })
             return
         }
-        if(amount == "") {
-            AlertMsg({title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error'})
+        if (amount == "") {
+            AlertMsg({ title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error' })
             return
         }
         const decimal = parseInt(_pid) < 5 ? CONFIG.ORBN_DECIMALS : CONFIG.USDT_DECIMALS
         const tokenAddress = parseInt(_pid) < 5 ? CONFIG.ORBN_ADDRESS : CONFIG.USDT_ADDRESS
         try {
             amount = ethers.utils.parseUnits(amount, decimal)
-        } catch(e) {
-            AlertMsg({title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error'})
+        } catch (e) {
+            AlertMsg({ title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error' })
             return
         }
-        setTamount(amount)
-        setLpToken(tokenAddress)
-        setPid(_pid)
-        updateLoading(true)
-        console.log(decimal)
+
         try {
-            approveWrite.write()
-        } catch(e) {
+            updateLoading(true)
+            await approve(amount, tokenAddress)
+            await deposit(_pid, amount)
+            fetchData()
+            refetchAccountData()
+            refetchRewards()
             updateLoading(false)
-            AlertMsg({title: 'Oops!', msg: 'Something went wrong', icon: 'error'})
+            AlertMsg({ title: 'Congratulation!', msg: 'Your transaction has been completed successfully', icon: 'success' })
+
+        } catch (e) {
+            updateLoading(false)
+            AlertMsg({ title: 'Oops!', msg: 'Something went wrong', icon: 'error' })
         }
-        
+
     }
 
     const handleWithdraw = async () => {
-        
+        if (!isConnected) {
+            openConnectModal()
+            return
+        }
+        const _pid = selPid.current.value
+        let amount = txtAmount.current.value
+        if (_pid == "") {
+            AlertMsg({ title: 'Oops!', msg: 'Select Lock Options', icon: 'error' })
+            return
+        }
+        if (amount == "") {
+            AlertMsg({ title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error' })
+            return
+        }
+        const decimal = parseInt(_pid) < 5 ? CONFIG.ORBN_DECIMALS : CONFIG.USDT_DECIMALS
+        const tokenAddress = parseInt(_pid) < 5 ? CONFIG.ORBN_ADDRESS : CONFIG.USDT_ADDRESS
+        try {
+            amount = ethers.utils.parseUnits(amount, decimal)
+        } catch (e) {
+            AlertMsg({ title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error' })
+            return
+        }
+
+        try {
+            updateLoading(true)
+            await withdraw(_pid, amount)
+            fetchData()
+            refetchAccountData()
+            refetchRewards()
+            updateLoading(false)
+            AlertMsg({ title: 'Congratulation!', msg: 'Your transaction has been completed successfully', icon: 'success' })
+
+        } catch (e) {
+            updateLoading(false)
+            AlertMsg({ title: 'Oops!', msg: 'Something went wrong', icon: 'error' })
+        }
     }
 
-    useEffect(()=> {
-        if(approveWait.isSuccess) {
-            // updateLoading(false)
-            stakeWrite.write()
-            // AlertMsg({title: 'Congrates!', msg: 'Your Transaction has been completed successfully', icon: 'success'})
-        }
-        if(stakingWait.isSuccess) {
-            updateLoading(false)
-            AlertMsg({title: 'Congrates!', msg: 'Your Transaction has been completed successfully', icon: 'success'})
-        }
-
-    }, [approveWait.isSuccess, stakingWait.isSuccess, approveWait.isLoading, stakingWait.isLoading ])
-    
     return (
         <Grid container rowSpacing={4.5} columnSpacing={3.75} sx={{ paddingTop: '5px' }}>
             {/* row 1 */}
@@ -293,7 +337,7 @@ const DashboardDefault = () => {
 
             {/* row 2 */}
             <Grid item xs={12} md={6} lg={5}>
-              <TimeComponent />
+                <TimeComponent />
             </Grid>
             <Grid item xs={12} md={6} lg={7}>
                 <MainCard>
@@ -350,29 +394,18 @@ const DashboardDefault = () => {
                             </select>
                         </Grid>
                     </Grid>
-                    <Box sx={{ px: 1, mb: 2 }}>
-                        {/* <Typography variant="h4" sx={{ fontWeight: 700 }} >Rewards Earned</Typography>
-                        <RadioGroup
-                            row
-                            aria-labelledby="demo-row-radio-buttons-group-label"
-                            name="row-radio-buttons-group"
-                        >
-                            <FormControlLabel value="ORBN" control={<Radio sx={{ color: '#F5331E', '&.Mui-checked': { color: "#F5331E" } }} />} label="ORBN" onChange={handleTokenChange} />
-                            <FormControlLabel value="USDT" control={<Radio sx={{ color: '#F5331E', '&.Mui-checked': { color: "#F5331E" } }} />} label="USDT" onChange={handleTokenChange} />
-                        </RadioGroup> */}
-                        
-                    </Box>
-                    <Grid container spacing={1.3}>
+
+                    <Grid container sx={{mt:1.2}}>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 0.5 }}>
                             <Button sx={{ ...styles.btn1 }} onClick={handleRewards}>Claim Rewards</Button>
                         </Grid>
                         <Grid item xs={12} sm={6} sx={{ px: 1, mb: 0.5 }}>
                             <Button sx={{ ...styles.btn1 }} onClick={handleWithdraw}>Withdraw Stake</Button>
                         </Grid>
-                        <Grid item xs={12} sm={12} sx={{ px: 1, mb: 0.4 }}>
+                        <Grid item xs={12} sm={12} sx={{ px: 1, mb: 0.4, mt:2.1 }}>
                             <Button sx={{ ...styles.btn }} onClick={handleStake}>Stake</Button>
                         </Grid>
-                        
+
                     </Grid>
 
                 </MainCard>
