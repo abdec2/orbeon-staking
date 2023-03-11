@@ -39,6 +39,24 @@ export const AppReducer = (state, action) => {
                 ...state,
                 rewards: action.payload
             }
+
+        case 'UPDATE_ORBN_PRICE':
+            return {
+                ...state,
+                orbn_usd_price: action.payload
+            }
+
+        case 'UPDATE_USDT_PRICE':
+            return {
+                ...state,
+                usdt_usd_price: action.payload
+            }
+
+        case 'UPDATE_GRAPH_DATA':
+            return {
+                ...state,
+                graphData: action.payload
+            }
         default:
             return state;
     };

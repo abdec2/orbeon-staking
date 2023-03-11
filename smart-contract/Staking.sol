@@ -51,9 +51,9 @@ contract MasterChef is Ownable, ReentrancyGuard {
 
     uint256 public totalClaimedRewards;
 
-    event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
-    event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
-    event Harvest(address indexed user, uint256 amount);
+    event Deposit(address indexed user, uint256 indexed pid, uint256 amount, uint256 indexed timestamp);
+    event Withdraw(address indexed user, uint256 indexed pid, uint256 amount, uint256 indexed timestamp);
+    event Harvest(address indexed user, uint256 amount, uint256 indexed timestamp);
 
     constructor(
         address _rewardToken
@@ -169,7 +169,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
             pool.lpToken.safeTransferFrom(address(msg.sender), address(this), _amount);
             user.amount = user.amount.add(_amount);
             pool.totalSupply = pool.totalSupply.add(_amount);
-            emit Deposit(msg.sender, _pid, user.amount);
+            emit Deposit(msg.sender, _pid, user.amount, block.timestamp);
         }
         user.rewardDebt = user.amount.mul(pool.accTokenPerShare).div(1e18);
     }
@@ -193,7 +193,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         }
 
         user.rewardDebt = user.amount.mul(pool.accTokenPerShare).div(1e18);
-        emit Withdraw(msg.sender, _pid, _amount);
+        emit Withdraw(msg.sender, _pid, _amount, block.timestamp);
     }
 
     // Pay or lockup pending 888s.
@@ -226,7 +226,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
             // send rewards
             rewardToken.safeTransferFrom(owner(), msg.sender, totalRewards);
             
-            emit Harvest(msg.sender, totalRewards);
+            emit Harvest(msg.sender, totalRewards, block.timestamp);
         }
     }
 

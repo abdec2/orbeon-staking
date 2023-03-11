@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
 
 // third-party
 import ReactApexChart from 'react-apexcharts';
+import { GlobalContext } from 'context/GlobalContext';
 
 // chart options
 const areaChartOptions = {
@@ -32,6 +33,7 @@ const areaChartOptions = {
 
 const IncomeAreaChart = ({ slot }) => {
     const theme = useTheme();
+    const { blockchainData } = useContext(GlobalContext)
 
     const { primary, secondary } = theme.palette.text;
     const line = theme.palette.divider;
@@ -59,7 +61,7 @@ const IncomeAreaChart = ({ slot }) => {
                     show: true,
                     color: "#ccc"
                 },
-                tickAmount:  7
+                tickAmount: 7
             },
             yaxis: {
                 labels: {
@@ -85,21 +87,21 @@ const IncomeAreaChart = ({ slot }) => {
         }));
     }, []);
 
-    const [series, setSeries] = useState([
+    const [series, setSeries] = useState([[
         {
             name: 'Staked',
             data: [31, 40, 28, 51, 42, 109, 100]
         }
-    ]);
+    ]]);
 
     useEffect(() => {
         setSeries([
             {
                 name: 'Staked',
-                data: [31, 40, 28, 51, 42, 109, 100]
+                data: blockchainData?.graphData?.usdt
             }
         ]);
-    }, [slot]);
+    }, [slot, blockchainData?.graphData?.usdt]);
 
     return <ReactApexChart options={options} series={series} type="line" height={205} />;
 };

@@ -136,7 +136,7 @@ const TimeComponent = () => {
                     </Stack>
                     {/* Countdown */}
                     <Countdown deadline={deadline} />
-                    <Typography variant="p" sx={styles.lockAmount}>Token Staked: {ethers.utils.formatUnits(stakeAmount,decimals) + " "+symbol} </Typography>
+                    <Typography variant="p" sx={styles.lockAmount}>Token Staked: {new Intl.NumberFormat("en-US").format(ethers.utils.formatUnits(stakeAmount,decimals)) + " "+symbol} </Typography>
                     <Typography variant="p" sx={{...styles.lockAmount, mt:1.5}}>Rewards Earned: {ethers.utils.formatUnits(rewardsEarned, CONFIG.ORBN_DECIMALS)} ORBN</Typography>
                 </Box>
             </Box>

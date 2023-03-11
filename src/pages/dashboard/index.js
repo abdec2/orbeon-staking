@@ -189,6 +189,8 @@ const DashboardDefault = () => {
     const refetchAccountData = useAccountData()
     const refetchRewards = useGetRewards()
 
+    const totalLockedValue = (parseFloat(blockchainData.lockedTokens.orbn) * parseFloat(blockchainData.orbn_usd_price)) + (parseFloat(blockchainData.lockedTokens.usdt) * parseFloat(blockchainData.usdt_usd_price))
+
     const handleRewards = async () => {
         if (!isConnected) {
             openConnectModal()
@@ -326,13 +328,13 @@ const DashboardDefault = () => {
         <Grid container rowSpacing={4.5} columnSpacing={3.75} sx={{ paddingTop: '5px' }}>
             {/* row 1 */}
             <Grid item xs={12} sm={12} md={4} lg={4}>
-                <StakingDetail title="Total Value Locked" count="$8,674,523.80" />
+                <StakingDetail title="Total Value Locked" count={'$ ' + new Intl.NumberFormat('en-US').format(totalLockedValue)} />
             </Grid>
             <Grid item xs={12} sm={12} md={4} lg={4}>
                 <ApyCard title="APY Rate" />
             </Grid>
             <Grid item xs={12} sm={12} md={4} lg={4}>
-                <StakingDetail title="Stakers" count={blockchainData.stakers.toString()} />
+                <StakingDetail title="Stakers" count={new Intl.NumberFormat('en-US').format(blockchainData.stakers.toString())} />
             </Grid>
 
             {/* row 2 */}
@@ -346,7 +348,8 @@ const DashboardDefault = () => {
                             <Typography variant="h4" sx={{ fontWeight: 700 }} >Staking</Typography>
                             <Stack direction="row" spacing={2.5}>
                                 <select style={styles.selectBox}>
-                                    <option value="1">Staked</option>
+                                    <option value="1">ORBN</option>
+                                    <option value="2">USDT</option>
                                 </select>
                                 <select style={{ ...styles.selectBox, width: '150px' }}>
                                     <option value="1">Last Week</option>
@@ -425,7 +428,7 @@ const DashboardDefault = () => {
                                             <div style={{ width: "1px", height: "10px", background: "#C7C8CC" }}></div>
                                             <Typography variant="p" sx={{ fontWeight: 400, fontSize: '16px', color: "#000515", opacity: 0.7 }} >Tether USD</Typography>
                                         </Stack>
-                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >$1.000 USD</Typography>
+                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >${blockchainData.usdt_usd_price} USD</Typography>
                                     </Stack>
                                 </Stack>
                             </Token>
@@ -434,11 +437,11 @@ const DashboardDefault = () => {
                                     <ORBN />
                                     <Stack spacing={1.5}>
                                         <Stack direction="row" spacing={1.2} alignItems="center">
-                                            <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >USDT</Typography>
+                                            <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >ORBN</Typography>
                                             <div style={{ width: "1px", height: "10px", background: "#C7C8CC" }}></div>
                                             <Typography variant="p" sx={{ fontWeight: 400, fontSize: '16px', color: "#000515", opacity: 0.7 }} >Orbeon Protocol</Typography>
                                         </Stack>
-                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >$28.000 USD</Typography>
+                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >${parseFloat(blockchainData.orbn_usd_price).toFixed(5)} USD</Typography>
                                     </Stack>
                                 </Stack>
                             </Token>
