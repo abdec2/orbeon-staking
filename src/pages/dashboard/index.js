@@ -189,7 +189,7 @@ const DashboardDefault = () => {
     const refetchAccountData = useAccountData()
     const refetchRewards = useGetRewards()
 
-    const totalLockedValue = (parseFloat(blockchainData.lockedTokens.orbn) * parseFloat(blockchainData.orbn_usd_price)) + (parseFloat(blockchainData.lockedTokens.usdt) * parseFloat(blockchainData.usdt_usd_price))
+    const totalLockedValue = (parseFloat(blockchainData.lockedTokens.orbn) * 0.1125 + (parseFloat(blockchainData.lockedTokens.usdt) * parseFloat(1)))
 
     const handleRewards = async () => {
         if (!isConnected) {
@@ -428,7 +428,7 @@ const DashboardDefault = () => {
                                             <div style={{ width: "1px", height: "10px", background: "#C7C8CC" }}></div>
                                             <Typography variant="p" sx={{ fontWeight: 400, fontSize: '16px', color: "#000515", opacity: 0.7 }} >Tether USD</Typography>
                                         </Stack>
-                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >${blockchainData.usdt_usd_price} USD</Typography>
+                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >$ 1.00 USD</Typography>
                                     </Stack>
                                 </Stack>
                             </Token>
@@ -441,7 +441,7 @@ const DashboardDefault = () => {
                                             <div style={{ width: "1px", height: "10px", background: "#C7C8CC" }}></div>
                                             <Typography variant="p" sx={{ fontWeight: 400, fontSize: '16px', color: "#000515", opacity: 0.7 }} >Orbeon Protocol</Typography>
                                         </Stack>
-                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >${parseFloat(blockchainData.orbn_usd_price).toFixed(5)} USD</Typography>
+                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >$ 0.1125 USD</Typography>
                                     </Stack>
                                 </Stack>
                             </Token>

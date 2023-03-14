@@ -98,10 +98,10 @@ const IncomeAreaChart = ({ slot }) => {
         setSeries([
             {
                 name: 'Staked',
-                data: blockchainData?.graphData?.usdt
+                data: [31, 40, 28, 51, 42, 109, 100]
             }
         ]);
-    }, [slot, blockchainData?.graphData?.usdt]);
+    }, [slot]);
 
     return <ReactApexChart options={options} series={series} type="line" height={205} />;
 };
