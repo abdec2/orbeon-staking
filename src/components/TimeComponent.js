@@ -19,9 +19,13 @@ const TimeComponent = () => {
     let symbol = opt < 5 ? "ORBN" : "USDT"
     let decimals = opt < 5 ? CONFIG.ORBN_DECIMALS : CONFIG.USDT_DECIMALS
 
-    let deadline = blockchainData.userStakes.length > 0 ? (parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[opt]?.duration.toString())) * 1000 : 0
-    deadline = isNaN(deadline) ? 0 : deadline
-    console.log(deadline)
+    let deadline = new Date().getTime()
+    if(parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) > 0) {
+        deadline = blockchainData.userStakes.length > 0 ? (parseInt(blockchainData?.userStakes[opt]?.timestamp.toString()) + parseInt(blockchainData?.pools[opt]?.duration.toString())) * 1000 : 0
+        deadline = isNaN(deadline) ? 0 : deadline
+        console.log(deadline)
+    }
+    
 
     let stakeAmount = blockchainData.userStakes.length > 0 ? (parseInt(blockchainData?.userStakes[opt]?.amount.toString())) : 0
     stakeAmount = isNaN(stakeAmount) ? 0 : stakeAmount

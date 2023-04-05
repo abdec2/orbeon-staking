@@ -358,7 +358,7 @@ const DashboardDefault = () => {
                         </Stack>
                         <Box>
                             <div style={{ marginTop: '32px' }}>
-                                <span style={{ ...styles.stakeChartvalue, color: '#F40E0E' }}>58,568.25</span>
+                                <span style={{ ...styles.stakeChartvalue, color: '#F40E0E' }}>0</span>
                                 <span style={{ ...styles.stakeChartvalue, fontWeight: 400, fontSize: '16px' }}> / ORBN Staked</span>
                             </div>
                         </Box>
@@ -441,7 +441,7 @@ const DashboardDefault = () => {
                                             <div style={{ width: "1px", height: "10px", background: "#C7C8CC" }}></div>
                                             <Typography variant="p" sx={{ fontWeight: 400, fontSize: '16px', color: "#000515", opacity: 0.7 }} >Orbeon Protocol</Typography>
                                         </Stack>
-                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >$ 0.1125 USD</Typography>
+                                        <Typography variant="p" sx={{ fontWeight: 700, fontSize: '16px' }} >$ {blockchainData.orbn_usd_price.toFixed(3)} USD</Typography>
                                     </Stack>
                                 </Stack>
                             </Token>

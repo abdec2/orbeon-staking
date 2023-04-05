@@ -320,7 +320,7 @@ export const GlobalProvider = ({ children }) => {
 
     const getDepositEvents = async () => {
         const contract = new ethers.Contract(CONFIG.STAKING_CONTRACT, stakingAbi, provider)
-        const fromBlock = await getPreviousBlockNumber()
+        const fromBlock = 16982905
         const events = await contract.queryFilter("Deposit", fromBlock)
         const usdtChartData = []
         const orbnChartData = []
@@ -346,8 +346,8 @@ export const GlobalProvider = ({ children }) => {
         const ORBNAddress = await pairContract.token1()
         const getReserves = await pairContract.getReserves()
         const routerContract = new ethers.Contract(CONFIG.UNISWAP_ROUTER_ADDRESS, routerAbi, provider)
-        const getAmountOut = await routerContract.getAmountOut(ethers.utils.parseEther('1'), getReserves._reserve1, getReserves._reserve0)
-        const finalAmount = (parseInt(getAmountOut.toString()) / 1e18).toFixed(9)
+        const getAmountOut = await routerContract.quote(ethers.utils.parseUnits('1', 9), getReserves._reserve0, getReserves._reserve1)
+        const finalAmount = (parseInt(getAmountOut.toString()) / 1e18)
         const ethPriceInUSD = await getEthInUSD('ETH-USD')
         const USDTPriceInUSD = await getEthInUSD('USDT-USD')
         const perTokenORBNPriceInUSD = finalAmount * parseFloat(ethPriceInUSD.amount)

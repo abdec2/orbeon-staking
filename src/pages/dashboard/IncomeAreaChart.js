@@ -46,7 +46,7 @@ const IncomeAreaChart = ({ slot }) => {
             colors: ["#F5331E"],
             xaxis: {
                 categories:
-                    ['Dec 16', 'Dec 17', 'Dec 18', 'Dec 19', 'Dec 20', 'Dec 21', 'Dec 22'],
+                    ['1', '2', '3', '4', '5', '6', '7'],
                 labels: {
                     style: {
                         colors: ["#000515"],
@@ -66,7 +66,7 @@ const IncomeAreaChart = ({ slot }) => {
             yaxis: {
                 labels: {
                     formatter: function (value) {
-                        return "$" + value
+                        return "" + value
                     },
                     style: {
                         colors: ["#000515"],
@@ -90,7 +90,7 @@ const IncomeAreaChart = ({ slot }) => {
     const [series, setSeries] = useState([[
         {
             name: 'Staked',
-            data: [31, 40, 28, 51, 42, 109, 100]
+            data: []
         }
     ]]);
 
@@ -98,7 +98,7 @@ const IncomeAreaChart = ({ slot }) => {
         setSeries([
             {
                 name: 'Staked',
-                data: [31, 40, 28, 51, 42, 109, 100]
+                data: []
             }
         ]);
     }, [slot]);
