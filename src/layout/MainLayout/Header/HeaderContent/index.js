@@ -34,8 +34,8 @@ const HeaderContent = () => {
                     <div style={{width: '1px', height:'28px', background:'#C7C8CC', marginRight: '9px'}}></div>
                     <ConnectBtn />
                     <div style={{width: '1px', height:'28px', background:'#C7C8CC', marginLeft: '9px', marginRight: '2px'}}></div>
-                    {!matchesXs && <Profile />}
-                    {matchesXs && <MobileSection />}
+                    {/* {!matchesXs && <Profile />} */}
+                    {/* {matchesXs && <MobileSection />} */}
                 </Box>
             </Box>
             

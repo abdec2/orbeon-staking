@@ -4,6 +4,8 @@ import { useContractReads } from "wagmi";
 import { CONFIG } from '../configs/config'
 import tokenAbi from './../configs/token.json'
 import stakingAbi from './../configs/staking.json'
+import { firestore } from "firebaseConfig";
+import { collection, getDocs, where, query } from "@firebase/firestore"
 
 import pairAbi from './../configs/pairAbi.json'
 import routerAbi from './../configs/routerAbi.json'
@@ -319,23 +321,29 @@ export const GlobalProvider = ({ children }) => {
     }
 
     const getDepositEvents = async () => {
-        const contract = new ethers.Contract(CONFIG.STAKING_CONTRACT, stakingAbi, provider)
-        const fromBlock = 16982905
-        const events = await contract.queryFilter("Deposit", fromBlock)
-        const usdtChartData = []
-        const orbnChartData = []
-        console.log(events)
-        events.map(item => {
-            const pid = parseInt(item.args.pid.toString())
-            if(pid < 5) {
-                const amount = Number(ethers.utils.formatUnits(item.args.amount, CONFIG.ORBN_DECIMALS))
-                orbnChartData.push(amount)
-            } else {
-                const amount = Number(ethers.utils.formatUnits(item.args.amount, CONFIG.USDT_DECIMALS))
-                usdtChartData.push(amount)
-            }
-        })
-        updateGraphData({orbn: orbnChartData, usdt: usdtChartData})
+        // const contract = new ethers.Contract(CONFIG.STAKING_CONTRACT, stakingAbi, provider)
+        // const fromBlock = 16982905
+        // const events = await contract.queryFilter("Deposit", fromBlock)
+        // const usdtChartData = []
+        // const orbnChartData = []
+        // console.log(events)
+        // events.map(item => {
+        //     const pid = parseInt(item.args.pid.toString())
+        //     if(pid < 5) {
+        //         const amount = Number(ethers.utils.formatUnits(item.args.amount, CONFIG.ORBN_DECIMALS))
+        //         orbnChartData.push(amount)
+        //     } else {
+        //         const amount = Number(ethers.utils.formatUnits(item.args.amount, CONFIG.USDT_DECIMALS))
+        //         usdtChartData.push(amount)
+        //     }
+        // })
+
+        const ref = collection(firestore, "staking")
+        const docSnap = await getDocs(ref)
+        console.log(docSnap)
+
+        
+        // updateGraphData({orbn: orbnChartData, usdt: usdtChartData})
     }
 
     const getTokenPrice = async () => {
