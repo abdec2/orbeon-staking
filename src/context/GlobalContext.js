@@ -5,7 +5,7 @@ import { CONFIG } from '../configs/config'
 import tokenAbi from './../configs/token.json'
 import stakingAbi from './../configs/staking.json'
 import { firestore } from "firebaseConfig";
-import { collection, getDocs, where, query } from "@firebase/firestore"
+import { collection, where, query, getDocs } from "@firebase/firestore"
 
 import pairAbi from './../configs/pairAbi.json'
 import routerAbi from './../configs/routerAbi.json'
@@ -51,7 +51,7 @@ const initialState = {
     rewards: [],
     orbn_usd_price: 0,
     usdt_usd_price: 0,
-    graphData : {
+    graphData: {
         orbn: [],
         usdt: []
     }
@@ -337,12 +337,23 @@ export const GlobalProvider = ({ children }) => {
         //         usdtChartData.push(amount)
         //     }
         // })
+        const curr = new Date()
+        const year = curr.getFullYear()
+        const month = ((curr.getMonth() + 1) < 10) ? "0" + (curr.getMonth() + 1) : (curr.getMonth() + 1)
+        const day = (curr.getDate() < 10) ? "0" + (curr.getDate()) : (curr.getDate())
+        const cur_date = year + "-" + month + "-" + day
+
 
         const ref = collection(firestore, "staking")
-        const docSnap = await getDocs(ref)
-        console.log(docSnap)
+        const q = query(ref, where("timestamp", "<=", cur_date))
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc);
+        });
 
-        
+
+
         // updateGraphData({orbn: orbnChartData, usdt: usdtChartData})
     }
 
