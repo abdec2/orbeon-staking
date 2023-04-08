@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { addDoc, collection, serverTimestamp } from "@firebase/firestore"
-import { firestore } from '../../firebaseConfig'
+// import { addDoc, collection, serverTimestamp } from "@firebase/firestore"
+// import { firestore } from '../../firebaseConfig'
 
 // material-ui
 import {
@@ -326,42 +326,42 @@ const DashboardDefault = () => {
         }
     }
 
-    const addData = () => {
-        const _pid = selPid.current.value
-        let amount = txtAmount.current.value
-        if (_pid == "") {
-            AlertMsg({ title: 'Oops!', msg: 'Select Lock Options', icon: 'error' })
-            return
-        }
-        if (amount == "") {
-            AlertMsg({ title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error' })
-            return
-        }
-        const decimal = parseInt(_pid) < 5 ? CONFIG.ORBN_DECIMALS : CONFIG.USDT_DECIMALS
-        const tokenAddress = parseInt(_pid) < 5 ? CONFIG.ORBN_ADDRESS : CONFIG.USDT_ADDRESS
-        try {
-            amount = ethers.utils.parseUnits(amount, decimal)
-        } catch (e) {
-            AlertMsg({ title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error' })
-            return
-        }
+    // const addData = () => {
+    //     const _pid = selPid.current.value
+    //     let amount = txtAmount.current.value
+    //     if (_pid == "") {
+    //         AlertMsg({ title: 'Oops!', msg: 'Select Lock Options', icon: 'error' })
+    //         return
+    //     }
+    //     if (amount == "") {
+    //         AlertMsg({ title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error' })
+    //         return
+    //     }
+    //     const decimal = parseInt(_pid) < 5 ? CONFIG.ORBN_DECIMALS : CONFIG.USDT_DECIMALS
+    //     const tokenAddress = parseInt(_pid) < 5 ? CONFIG.ORBN_ADDRESS : CONFIG.USDT_ADDRESS
+    //     try {
+    //         amount = ethers.utils.parseUnits(amount, decimal)
+    //     } catch (e) {
+    //         AlertMsg({ title: 'Oops!', msg: 'Enter Valid Amount', icon: 'error' })
+    //         return
+    //     }
 
-        const ref = collection(firestore, "staking")
-        let data = {
-            pid: parseInt(_pid),
-            amount: parseFloat(txtAmount.current.value),
-            user: address, 
-            token: tokenAddress,
-            timestamp: serverTimestamp()
-        }
+    //     const ref = collection(firestore, "staking")
+    //     let data = {
+    //         pid: parseInt(_pid),
+    //         amount: parseFloat(txtAmount.current.value),
+    //         user: address, 
+    //         token: tokenAddress,
+    //         timestamp: serverTimestamp()
+    //     }
 
-        try{
-            addDoc(ref, data)
-        } catch(e) {
-            console.log(e)
-        }
+    //     try{
+    //         addDoc(ref, data)
+    //     } catch(e) {
+    //         console.log(e)
+    //     }
 
-    }
+    // }
 
     return (
         <Grid container rowSpacing={4.5} columnSpacing={3.75} sx={{ paddingTop: '5px' }}>
@@ -397,8 +397,8 @@ const DashboardDefault = () => {
                         </Stack>
                         <Box>
                             <div style={{ marginTop: '32px' }}>
-                                <span style={{ ...styles.stakeChartvalue, color: '#F40E0E' }}>0</span>
-                                <span style={{ ...styles.stakeChartvalue, fontWeight: 400, fontSize: '16px' }}> / ORBN Staked</span>
+                                <span style={{ ...styles.stakeChartvalue, color: '#F40E0E' }}>{'$ ' + new Intl.NumberFormat('en-US').format(totalLockedValue)}</span>
+                                {/* <span style={{ ...styles.stakeChartvalue, fontWeight: 400, fontSize: '16px' }}> / ORBN Staked</span> */}
                             </div>
                         </Box>
                     </Box>
@@ -445,7 +445,7 @@ const DashboardDefault = () => {
                             <Button sx={{ ...styles.btn1 }} onClick={handleWithdraw}>Withdraw Stake</Button>
                         </Grid>
                         <Grid item xs={12} sm={12} sx={{ px: 1, mb: 0.4, mt:2.1 }}>
-                            <Button sx={{ ...styles.btn }} onClick={addData}>Stake</Button>
+                            <Button sx={{ ...styles.btn }} onClick={handleStake}>Stake</Button>
                         </Grid>
 
                     </Grid>

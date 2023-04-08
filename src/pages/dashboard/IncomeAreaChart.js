@@ -90,7 +90,7 @@ const IncomeAreaChart = ({ slot }) => {
     const [series, setSeries] = useState([[
         {
             name: 'Staked',
-            data: []
+            data: [31, 40, 28, 51, 42, 109, 100]
         }
     ]]);
 
@@ -98,7 +98,7 @@ const IncomeAreaChart = ({ slot }) => {
         setSeries([
             {
                 name: 'Staked',
-                data: []
+                data: [31, 40, 28, 51, 42, 109, 100]
             }
         ]);
     }, [slot]);
